@@ -1,20 +1,17 @@
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.AI;
+
 
 public class Enemy : MonoBehaviour
 {
+    [Header("Configuration")]
     public int life = 30;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    Vector3 destination;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    [Header("Components")]
+    [SerializeField] protected NavMeshAgent agent;
 
     private void OnCollisionEnter(Collision collision)
     {
@@ -29,6 +26,20 @@ public class Enemy : MonoBehaviour
     {
         life -= damage;
         if (life < 1)
-            Destroy(gameObject);
+        {
+            GameHandler.Instance.EnemyDeath(this);
+            Die();
+        }
+    }
+
+    protected virtual void Die()
+    {
+        Destroy(gameObject);
+    }
+
+    protected void SetDestination(Vector3 destination)
+    {
+        this.destination = destination;
+        agent.destination = destination;
     }
 }
