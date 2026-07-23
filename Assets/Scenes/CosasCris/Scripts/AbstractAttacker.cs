@@ -10,7 +10,7 @@ public abstract class AbstractAttacker : IAttacker
         alive = true;
     }
 
-    public abstract void Attack(Vector3 origin, Vector3 direction);
+    public abstract void Attack(Vector3 origin, Vector3 forward);
 
     public bool isAlive()
     {

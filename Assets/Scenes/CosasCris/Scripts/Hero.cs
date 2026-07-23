@@ -7,6 +7,7 @@ using UnityEngine.InputSystem;
 
 public class Hero : MonoBehaviour
 {
+    Camera cam;
     private List<IAttacker> attacks;
     private IAttacker attacker;
 
@@ -19,24 +20,28 @@ public class Hero : MonoBehaviour
     #region Movement
     public float movementSpeed = 750;
     public float turnSpeed = 1;
-    private bool canMove;
+    private bool canMove; 
 
 
-    private Rigidbody rb;
+    private CharacterController cc;
 
     #endregion
     public bool isAttacking;
-
+    private void Awake()
+    {
+        cc = GetComponent<CharacterController>();
+        cam = Camera.main;
+    }
 
     // Start is called before the first frame update
     void Start()
     {
         isAttacking = false;
         canMove = true;
-        rb = GetComponent<Rigidbody>();
 
         attacks = new List<IAttacker>();
         attacks.Add(new Exploder());
+        attacks.Add(new MissileLauncher());
         attacker = attacks[0];
     }
 
@@ -49,30 +54,34 @@ public class Hero : MonoBehaviour
             Attack();
 
         DecideDirection();
+
+        HandleAim();
     }
 
     private void DecideAttack()
     {
         if (Keyboard.current.digit1Key.isPressed)
             attacker = attacks[0];
+        if (Keyboard.current.digit2Key.isPressed)
+            attacker = attacks[1];
     }
 
     private void FixedUpdate()
     {
-        rb.AddForce(desiredDirection.normalized * movementSpeed * Time.fixedDeltaTime);
+        cc.Move(desiredDirection.normalized * movementSpeed * Time.fixedDeltaTime);
     }
 
     private void DecideDirection()
     {
         desiredDirection = Vector3.zero;
         if (Keyboard.current.wKey.isPressed)
-            desiredDirection += transform.forward;
+            desiredDirection += Vector3.forward;
         else if (Keyboard.current.sKey.isPressed)
-            desiredDirection += -transform.forward;
+            desiredDirection += -Vector3.forward;
         if (Keyboard.current.aKey.isPressed)
-            desiredDirection += -transform.right;
+            desiredDirection += -Vector3.right;
         else if (Keyboard.current.dKey.isPressed)
-            desiredDirection += transform.right;
+            desiredDirection += Vector3.right;
     }
 
     private void Attack()
@@ -95,5 +104,27 @@ public class Hero : MonoBehaviour
         }
 
         isAttacking = false;
+    }
+
+    private void HandleAim()
+    {
+        if (cam == null) return;
+
+        Ray ray = cam.ScreenPointToRay(Input.mousePosition);
+        Plane groundPlane = new Plane(Vector3.up, transform.position);
+
+        if (!groundPlane.Raycast(ray, out float enter)) return;
+
+        Vector3 hitPoint = ray.GetPoint(enter);
+        Vector3 lookDir = hitPoint - transform.position;
+        lookDir.y = 0f;
+
+        if (lookDir.sqrMagnitude < 0.0001f) return;
+
+        Quaternion target = Quaternion.LookRotation(lookDir);
+
+        transform.rotation = turnSpeed <= 0f
+            ? target
+            : Quaternion.RotateTowards(transform.rotation, target, turnSpeed * Time.deltaTime);
     }
 }
