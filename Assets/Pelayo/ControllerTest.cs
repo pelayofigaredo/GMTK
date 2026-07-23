@@ -45,9 +45,12 @@ public class ControllerTest : MonoBehaviour
 
         if (!groundPlane.Raycast(ray, out float enter)) return;
 
+
         Vector3 hitPoint = ray.GetPoint(enter);
         Vector3 lookDir = hitPoint - transform.position;
-        lookDir.y = 0f;                              
+        lookDir.y = 0f;
+
+        Debug.DrawLine(transform.position, hitPoint);
 
         if (lookDir.sqrMagnitude < 0.0001f) return; 
 
