@@ -1,5 +1,7 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using static UnityEngine.Rendering.DebugUI;
 
 public class EnemySpawner : MonoBehaviour
 {
@@ -12,6 +14,11 @@ public class EnemySpawner : MonoBehaviour
     [SerializeField] int baseSpawnCount = 3;
     [SerializeField] int baseMaxAlive = 10;
 
+    [Header("Level Update")]
+    [SerializeField] float intervalDecreaseByLevel = 0.2f;
+    [SerializeField] int spawnCountIncreaseByLevel = 1;
+    [SerializeField] int maxAliveIncreaseByLevel = 5;
+
     [Header("Spawn Points")]
     [SerializeField] Transform[] spawnPoints;
     [SerializeField] float spawnRadius = 15f;
@@ -19,7 +26,6 @@ public class EnemySpawner : MonoBehaviour
 
     float timer;
     int spawnedCount;
-    int aliveCount;
     int maxAlive;
     int spawnCount;
     bool active;
@@ -27,20 +33,22 @@ public class EnemySpawner : MonoBehaviour
     float minInterval;
     float maxInterval;
 
+    List<Enemy> aliveEnemies = new List<Enemy>();
+
     void Start()
     {
         minInterval = baseMinInterval;
         maxInterval = baseMaxInterval;
         maxAlive = baseMaxAlive;
         spawnCount = baseSpawnCount;
-    } 
+    }
 
     void Update()
     {
         if (!active)
             return;
 
-        if (aliveCount >= maxAlive) return;
+        if (aliveEnemies.Count >= maxAlive) return;
 
         timer -= Time.deltaTime;
         if (timer > 0f) return;
@@ -49,14 +57,38 @@ public class EnemySpawner : MonoBehaviour
         timer = Random.Range(minInterval, maxInterval);
     }
 
-    public void EnemyDeath()
+    public void UpdateValues(int currentLevel)
     {
-        aliveCount--;
+        minInterval = baseMinInterval - (intervalDecreaseByLevel * currentLevel);
+        maxInterval = baseMaxInterval - (intervalDecreaseByLevel * currentLevel);
+        maxAlive = baseMaxAlive + (maxAliveIncreaseByLevel * currentLevel);
+        spawnCount = baseSpawnCount + (spawnCountIncreaseByLevel * currentLevel);
+    }
+
+    public void FreezeAllEnemies()
+    {
+        for (int i = aliveEnemies.Count - 1; i >= 0; i--)
+        {
+            aliveEnemies[i].Freeze();
+        }
+    }
+
+    public void KillAllEnemies()
+    {
+        for (int i = aliveEnemies.Count - 1; i >= 0; i--)
+        {
+            aliveEnemies[i].Kill();
+        }
+    }
+
+    public void EnemyDeath(Enemy enemy)
+    {
+        aliveEnemies.Remove(enemy);
     }
 
     void SpawnSeveral(int spawnCount)
     {
-        for (int i = 0; i < spawnCount; i++) 
+        for (int i = 0; i < spawnCount; i++)
             SpawnOne();
     }
 
@@ -66,8 +98,7 @@ public class EnemySpawner : MonoBehaviour
 
         Enemy prefab = enemyPrefabs[Random.Range(0, enemyPrefabs.Length)];
         Enemy enemy = Instantiate(prefab, pos, Quaternion.identity);
-
-        aliveCount++;
+        aliveEnemies.Add(enemy);
         spawnedCount++;
     }
 
@@ -84,14 +115,14 @@ public class EnemySpawner : MonoBehaviour
         }
 
         result = candidate;
-        return false;  
+        return false;
     }
 
-    public void StopSpawning() { active = false; } 
+    public void StopSpawning() { active = false; }
     public void ResumeSpawning()
     {
         active = true;
-    } 
+    }
 
 #if UNITY_EDITOR
 

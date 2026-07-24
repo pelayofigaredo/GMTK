@@ -30,6 +30,7 @@ public class EndExplosionAnimator : MonoBehaviour
     [SerializeField] private float initialAnimationWait = 1f;
 
     public event System.Action OnComplete;
+    public event System.Action OnHidden;
 
     public float T
     {
@@ -92,6 +93,9 @@ public class EndExplosionAnimator : MonoBehaviour
         characterHandler.Die();
         yield return new WaitForSeconds(initialAnimationWait);
         explosion.gameObject.SetActive(true);
+
+        bool launchHidden = false;
+
         if (duration <= 0f)
         {
             T = 1f;
@@ -101,6 +105,14 @@ public class EndExplosionAnimator : MonoBehaviour
             float elapsed = 0f;
             while (elapsed < duration)
             {
+                if (!launchHidden)
+                {
+                    if (elapsed > duration / 2)
+                    {
+                        launchHidden = true;
+                        OnHidden();
+                    }
+                }
                 elapsed += Time.deltaTime;
                 T = Mathf.Clamp01(elapsed / duration);
                 Apply();

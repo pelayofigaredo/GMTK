@@ -20,7 +20,7 @@ Material:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: character2_body_m
+  m_Name: character4_body_m
   m_Shader: {fileID: -6465566751694194690, guid: aa1f87bac4ad98241953d45acd26cfe9, type: 3}
   m_Parent: {fileID: 0}
   m_ModifiedSerializedProperties: 0
@@ -143,8 +143,8 @@ Material:
     m_Colors:
     - _BaseColor: {r: 0.95923185, g: 1, b: 0.4292453, a: 1}
     - _Color: {r: 0.9592318, g: 1, b: 0.42924526, a: 1}
-    - _ColorA: {r: 0.254717, g: 0.13677156, b: 0.08050018, a: 1}
-    - _ColorB: {r: 0.03831435, g: 0.38679248, b: 0.060264472, a: 1}
+    - _ColorA: {r: 0.254717, g: 0.254717, b: 0.254717, a: 1}
+    - _ColorB: {r: 0.7735849, g: 0.73690665, b: 0.36854753, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _SpecColor: {r: 0.19999996, g: 0.19999996, b: 0.19999996, a: 1}
   m_BuildTextureStacks: []

@@ -1,4 +1,4 @@
-using Unity.VisualScripting;
+using System;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -8,6 +8,7 @@ public class Enemy : MonoBehaviour
     [Header("Configuration")]
     public int life = 30;
 
+    protected bool frozen = false;
     Vector3 destination;
 
     [Header("Components")]
@@ -42,5 +43,15 @@ public class Enemy : MonoBehaviour
     {
         this.destination = destination;
         agent.destination = destination;
+    }
+
+    internal void Kill()
+    {
+        ReceiveDamage(life);
+    }
+
+    internal void Freeze()
+    {
+        frozen = true;
     }
 }

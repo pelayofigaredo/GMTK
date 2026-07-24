@@ -1,5 +1,5 @@
 using System;
-using Unity.VisualScripting;
+using System.Collections;
 using UnityEngine;
 
 /***
@@ -31,6 +31,7 @@ public class GameHandler : MonoBehaviour
     [SerializeField] UIHandler uiHandler;
     [SerializeField] EnemySpawner enemySpawner;
     [SerializeField] Hero hero;
+    [SerializeField] EndExplosionAnimator endExplosionAnimator;
 
     public Hero Hero { get => hero; }
 
@@ -39,8 +40,9 @@ public class GameHandler : MonoBehaviour
     float roundTimer;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    IEnumerator Start()
     {
+        yield return new WaitForSeconds(0.2f);
         StartRound();
     }
 
@@ -63,7 +65,7 @@ public class GameHandler : MonoBehaviour
     }
 
     //Aqui querremos hacer algo de guays 
-    public void EnemyDeath(Enemy enemy) {enemySpawner.EnemyDeath(); }
+    public void EnemyDeath(Enemy enemy) {enemySpawner.EnemyDeath(enemy); }
 
     public void AttackUpdate(IAttacker[] attacks)
     {
@@ -83,6 +85,7 @@ public class GameHandler : MonoBehaviour
     {
         isInRound = true;
         roundTimer = roundDuration;
+        enemySpawner.UpdateValues(roundIndex);
         enemySpawner.ResumeSpawning();
     }
 
@@ -96,15 +99,43 @@ public class GameHandler : MonoBehaviour
     //El jugador sobrevivio
     void RoundWon()
     {
-        if (!hero.YouAlwaysLoseOne()) //Si aún quedan más momias
+        if (hero.RemainingPeople >= 2) //Si aún quedan más momias
         {
-            uiHandler.UpdateAttacks(hero.GetAttacks());
-            StartRound();
+            StartCoroutine(AdvanceRoundCR());
         }
         else //Si esta era la última
             Victory();
     }
 
+    IEnumerator AdvanceRoundCR()
+    {
+        enemySpawner.FreezeAllEnemies();
+        hero.Freeze(true);
+
+        bool hidden = false;
+        bool completed = false;
+
+        Action onHidden = () => hidden = true;
+        Action onComplete = () => completed = true;
+
+        endExplosionAnimator.OnHidden += onHidden;
+        endExplosionAnimator.OnComplete += onComplete;
+        endExplosionAnimator.Play();
+
+        yield return new WaitUntil(() => hidden);
+        endExplosionAnimator.OnHidden -= onHidden;
+
+        hero.YouAlwaysLoseOne();
+        uiHandler.UpdateAttacks(hero.GetAttacks());
+
+        enemySpawner.KillAllEnemies();
+
+        yield return new WaitUntil(() => completed);
+        endExplosionAnimator.OnComplete -= onComplete;
+
+        hero.Freeze(false);
+        StartRound();
+    }
 
     private void Victory()
     {

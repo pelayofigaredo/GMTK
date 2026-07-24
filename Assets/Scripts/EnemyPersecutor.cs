@@ -44,7 +44,7 @@ public class EnemyPersecutor : Enemy
 
     void Update()
     {
-        if (player == null) return;
+        if (player == null || frozen) return;
 
         float distToPlayer = Vector3.Distance(transform.position, player.position);
 

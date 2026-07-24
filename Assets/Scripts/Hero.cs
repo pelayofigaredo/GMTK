@@ -18,6 +18,10 @@ public class Hero : MonoBehaviour
     private float elapsedtime;
     public static readonly float GCD = 1f;
 
+    int remainingPeople;
+    bool isFroozen = false;
+
+
     //Movement Stats
     #region Movement
     public float movementSpeed = 750;
@@ -29,6 +33,9 @@ public class Hero : MonoBehaviour
 
     #endregion
     public bool isAttacking;
+
+    public int RemainingPeople { get => remainingPeople; }
+
     private void Awake()
     {
         cc = GetComponent<CharacterController>();
@@ -42,16 +49,26 @@ public class Hero : MonoBehaviour
         canMove = true;
 
         attacks = new List<IAttacker>();
-        attacks.Add(new Exploder());
         attacks.Add(new MissileLauncher());
+        attacks.Add(new Exploder());
         attacks.Add(new RunePlacer());
+
         attacker = attacks[0];
+        remainingPeople = attacks.Count;
         GameHandler.Instance.AttackUpdate(attacks.ToArray());
     }
 
     // Update is called once per frame
     void Update()
     {
+        if (isFroozen)
+        {
+            desiredDirection = Vector3.zero;
+            characterHandler.SetParameters(transform, desiredDirection);
+            return;
+        }
+
+
         DecideAttack();
 
         if (!isAttacking && (Mouse.current.leftButton.wasPressedThisFrame || Keyboard.current.spaceKey.wasPressedThisFrame))
@@ -111,7 +128,7 @@ public class Hero : MonoBehaviour
                 mostUsedAttack = attack;
              }
         }
-
+        remainingPeople--;
         mostUsedAttack.Die();
         attacker = attacks.Find(a => a.isAlive());
 
@@ -162,5 +179,11 @@ public class Hero : MonoBehaviour
         transform.rotation = turnSpeed <= 0f
             ? target
             : Quaternion.RotateTowards(transform.rotation, target, turnSpeed * Time.deltaTime);
+    }
+
+
+    internal void Freeze(bool v)
+    {
+        isFroozen = v;
     }
 }
