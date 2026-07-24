@@ -10,25 +10,28 @@ public class CharacterHandler : MonoBehaviour
 
     Animator activeAnimator;
 
-    Animator[] animators;
+    AnimatorBridge[] animators;
 
     int current = 0;
+    bool isAttacking = false;
+
 
     void Start()
     {
-        animators = new Animator[characters.Length];
+        animators = new AnimatorBridge[characters.Length];
         for (int i = 0; i < characters.Length; i++)
         {
-            animators[i] = characters[i].GetComponentInChildren<Animator>();
+            animators[i] = characters[i].GetComponentInChildren<AnimatorBridge>();
+            animators[i].OnAttack += CompleteAttack;
             characters[i].gameObject.SetActive(false);
         }
         characters[current].gameObject.SetActive(true);
-        activeAnimator = animators[current];
+        activeAnimator = animators[current].Animator;
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if(Input.GetKeyDown(KeyCode.E))
         {
             int newIndex = (current + 1)%characters.Length;
             SetCharacter(newIndex);
@@ -37,6 +40,9 @@ public class CharacterHandler : MonoBehaviour
 
     public void SetCharacter(int characterIndex)
     {
+        if (isAttacking)
+            return;
+
         StopAllCoroutines();
         StartCoroutine(ChangeCharacterCR(characterIndex));
     }
@@ -50,7 +56,7 @@ public class CharacterHandler : MonoBehaviour
 
         current = characterIndex;
         characters[current].gameObject.SetActive(true);
-        activeAnimator = animators[current];
+        activeAnimator = animators[current].Animator;
     }
 
     internal void SetParameters(Transform playerTransform, Vector3 desiredDirection)
@@ -78,8 +84,18 @@ public class CharacterHandler : MonoBehaviour
 
     }
 
-    internal void Attack(IAttacker attacker)
+    internal IEnumerator Attack(IAttacker attacker)
     {
+        isAttacking = true;
         activeAnimator.SetTrigger("attack");
+        while (isAttacking) 
+        { 
+            yield return null;
+        }
+    }
+
+    public void CompleteAttack()
+    {
+        isAttacking=false;
     }
 }

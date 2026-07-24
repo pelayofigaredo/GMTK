@@ -125,11 +125,10 @@ public class Hero : MonoBehaviour
         isAttacking = true;
         elapsedtime = 0;
 
+        yield return characterHandler.Attack(attacker);
+
         attacker.Attack(transform.position, transform.forward);
         GameHandler.Instance.AttackUpdate(attacks.ToArray());
-
-        //Todo, aqui hay que meter mano, al ataque va a tnere que tener un chikidelay dependiente de la animacion, porque si no es mucha ortopedia
-        characterHandler.Attack(attacker);
 
         while (elapsedtime < GCD)
         {
