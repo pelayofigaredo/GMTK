@@ -85,11 +85,20 @@ public class Hero : MonoBehaviour
     private void DecideAttack()
     {
         if (Keyboard.current.digit1Key.isPressed && attacks[0].isAlive())
-            attacker = attacks[0];
+            SetActiveAttacker(0);
         if (Keyboard.current.digit2Key.isPressed && attacks[1].isAlive())
-            attacker = attacks[1];
+            SetActiveAttacker(1);
         if (Keyboard.current.digit3Key.isPressed && attacks[2].isAlive())
-            attacker = attacks[2];
+            SetActiveAttacker(2);
+    }
+
+    void SetActiveAttacker(int index)
+    {
+        if (!attacks[index].isAlive())
+            return;
+
+        attacker = attacks[index];
+        characterHandler.SetCharacter(index);
     }
 
     private void FixedUpdate()
