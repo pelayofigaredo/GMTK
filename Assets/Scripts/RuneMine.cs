@@ -1,9 +1,7 @@
 using UnityEngine;
 
-public class Missile : MonoBehaviour
+public class RuneMine : MonoBehaviour
 {
-    public bool explosivo = true;
-    public float speed = 10f;
     public static GameObject prefabExplosion;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
@@ -15,15 +13,11 @@ public class Missile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(Vector3.forward * speed * Time.fixedDeltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)
     {
         Destroy(gameObject);
-        if(explosivo)
-            Instantiate(prefabExplosion, transform.position, transform.rotation);
+        Instantiate(prefabExplosion, transform.position, transform.rotation);
     }
-
-
 }

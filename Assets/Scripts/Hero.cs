@@ -44,6 +44,7 @@ public class Hero : MonoBehaviour
         attacks = new List<IAttacker>();
         attacks.Add(new Exploder());
         attacks.Add(new MissileLauncher());
+        attacks.Add(new RunePlacer());
         attacker = attacks[0];
         GameHandler.Instance.AttackUpdate(attacks.ToArray());
     }
@@ -70,6 +71,8 @@ public class Hero : MonoBehaviour
             attacker = attacks[0];
         if (Keyboard.current.digit2Key.isPressed && attacks[1].isAlive())
             attacker = attacks[1];
+        if (Keyboard.current.digit3Key.isPressed && attacks[2].isAlive())
+            attacker = attacks[2];
     }
 
     private void FixedUpdate()
