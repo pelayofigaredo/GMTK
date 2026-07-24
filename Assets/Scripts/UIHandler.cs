@@ -7,8 +7,7 @@ public class UIHandler : MonoBehaviour
 {
     [Header("Components")]
     [SerializeField] TextMeshProUGUI timerText;
-    [SerializeField] Transform attackButtonsParent;
-    TextMeshProUGUI[] attackUIIndicators;
+    [SerializeField] UIAttackBarGroup attackBarGroup;
 
 
     internal void UpdateTimer(float roundTimer)
@@ -19,7 +18,7 @@ public class UIHandler : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        attackUIIndicators = attackButtonsParent.GetComponentsInChildren<TextMeshProUGUI>();
+        attackBarGroup.SetValue(0);
     }
 
     // Update is called once per frame
@@ -32,8 +31,11 @@ public class UIHandler : MonoBehaviour
     {
         for (int i = 0; i < attacks.Length; i++)
         {
-            attackUIIndicators[i].transform.parent.gameObject.SetActive(attacks[i].isAlive());
-            attackUIIndicators[i].text = attacks[i].GetUses()+"";
+            if (!attacks[i].isAlive())
+            {
+                attackBarGroup.ApplyColor(i, Color.gray3);
+            }
+            attackBarGroup.SetValue(i,attacks[i].GetUses());
         }
     }
 
