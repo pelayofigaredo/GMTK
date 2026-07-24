@@ -98,4 +98,9 @@ public class CharacterHandler : MonoBehaviour
     {
         isAttacking=false;
     }
+
+    internal void Die()
+    {
+        activeAnimator.SetTrigger("death");
+    }
 }
