@@ -7,7 +7,7 @@ public class RuneMine : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        prefabExplosion = Resources.Load<GameObject>("ExplosionLejana");
+        prefabExplosion = Resources.Load<GameObject>("ExplosionMina");
     }
 
     // Update is called once per frame
@@ -17,7 +17,7 @@ public class RuneMine : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Destroy(gameObject);
         Instantiate(prefabExplosion, transform.position, transform.rotation);
+        Destroy(gameObject);
     }
 }
