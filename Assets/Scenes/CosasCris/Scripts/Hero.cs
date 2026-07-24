@@ -7,6 +7,8 @@ using UnityEngine.InputSystem;
 
 public class Hero : MonoBehaviour
 {
+    [SerializeField] CharacterHandler characterHandler;
+
     Camera cam;
     private List<IAttacker> attacks;
     private IAttacker attacker;
@@ -57,6 +59,9 @@ public class Hero : MonoBehaviour
         DecideDirection();
 
         HandleAim();
+
+        //Animator (movimiento)1.
+        characterHandler.SetParameters(transform, desiredDirection);
     }
 
     private void DecideAttack()
@@ -122,6 +127,9 @@ public class Hero : MonoBehaviour
 
         attacker.Attack(transform.position, transform.forward);
         GameHandler.Instance.AttackUpdate(attacks.ToArray());
+
+        //Todo, aqui hay que meter mano, al ataque va a tnere que tener un chikidelay dependiente de la animacion, porque si no es mucha ortopedia
+        characterHandler.Attack(attacker);
 
         while (elapsedtime < GCD)
         {
