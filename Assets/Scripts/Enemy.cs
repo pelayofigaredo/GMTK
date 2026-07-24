@@ -53,5 +53,6 @@ public class Enemy : MonoBehaviour
     internal void Freeze()
     {
         frozen = true;
+        agent.isStopped=true;
     }
 }
