@@ -25,7 +25,7 @@ public class GameHandler : MonoBehaviour
     #endregion
 
     [Header("Configuration")]
-    [SerializeField] float roundDuration = 120;
+    [SerializeField] float roundDuration = 15;
 
     [Header("Components")]
     [SerializeField] UIHandler uiHandler;
@@ -65,6 +65,11 @@ public class GameHandler : MonoBehaviour
     //Aqui querremos hacer algo de guays 
     public void EnemyDeath(Enemy enemy) {enemySpawner.EnemyDeath(); }
 
+    public void AttackUpdate(IAttacker[] attacks)
+    {
+        uiHandler.UpdateAttacks(attacks);
+
+    }
 
     internal void Lose()
     {
@@ -91,7 +96,19 @@ public class GameHandler : MonoBehaviour
     //El jugador sobrevivio
     void RoundWon()
     {
+        if (!hero.YouAlwaysLoseOne()) //Si aún quedan más momias
+        {
+            uiHandler.UpdateAttacks(hero.GetAttacks());
+            StartRound();
+        }
+        else //Si esta era la última
+            Victory();
+    }
 
+
+    private void Victory()
+    {
+        Debug.Log("You win!");
     }
     #endregion
 

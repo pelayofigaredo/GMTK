@@ -13,10 +13,11 @@ public class Enemy : MonoBehaviour
     [Header("Components")]
     [SerializeField] protected NavMeshAgent agent;
 
-    private void OnCollisionEnter(Collision collision)
+    protected void OnCollisionEnter(Collision collision)
     {
         if (collision.collider.GetComponent<Hero>() != null)
         {
+            Debug.Log("No puedo caer más bajo");
             Destroy(collision.collider.gameObject);
             GameObject.FindAnyObjectByType<GameHandler>().Lose();
         }

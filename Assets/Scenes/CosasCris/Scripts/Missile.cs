@@ -14,7 +14,7 @@ public class Missile : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        transform.Translate(transform.forward.normalized * speed * Time.fixedDeltaTime);
+        transform.Translate(Vector3.forward * speed * Time.fixedDeltaTime);
     }
 
     private void OnCollisionEnter(Collision collision)

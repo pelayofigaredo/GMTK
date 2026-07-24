@@ -43,6 +43,7 @@ public class Hero : MonoBehaviour
         attacks.Add(new Exploder());
         attacks.Add(new MissileLauncher());
         attacker = attacks[0];
+        GameHandler.Instance.AttackUpdate(attacks.ToArray());
     }
 
     // Update is called once per frame
@@ -60,9 +61,9 @@ public class Hero : MonoBehaviour
 
     private void DecideAttack()
     {
-        if (Keyboard.current.digit1Key.isPressed)
+        if (Keyboard.current.digit1Key.isPressed && attacks[0].isAlive())
             attacker = attacks[0];
-        if (Keyboard.current.digit2Key.isPressed)
+        if (Keyboard.current.digit2Key.isPressed && attacks[1].isAlive())
             attacker = attacks[1];
     }
 
@@ -84,6 +85,31 @@ public class Hero : MonoBehaviour
             desiredDirection += Vector3.right;
     }
 
+    internal IAttacker[] GetAttacks()
+    {
+        return attacks.ToArray(); ;
+    }
+
+    internal bool YouAlwaysLoseOne()
+    {
+        int maxValue = 0;
+        IAttacker mostUsedAttack = attacks[0];
+
+        foreach (IAttacker attack in attacks)
+        {
+            if(attack.isAlive())
+            if (attack.GetUses() > maxValue) { 
+                maxValue = attack.GetUses();
+                mostUsedAttack = attack;
+             }
+        }
+
+        mostUsedAttack.Die();
+        attacker = attacks.Find(a => a.isAlive());
+
+        return attacker==null;
+    }
+
     private void Attack()
     {
         StartCoroutine(PerformAttack());
@@ -95,10 +121,10 @@ public class Hero : MonoBehaviour
         elapsedtime = 0;
 
         attacker.Attack(transform.position, transform.forward);
+        GameHandler.Instance.AttackUpdate(attacks.ToArray());
 
         while (elapsedtime < GCD)
         {
-            Debug.Log("Elapsedtime: " + elapsedtime);
             elapsedtime += Time.deltaTime;
             yield return 0;
         }
